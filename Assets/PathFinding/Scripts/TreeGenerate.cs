@@ -5,7 +5,7 @@ using System;
 using UnityEngine.Serialization;
 
 
-class TreeNode
+public class TreeNode
 {
     public GameObject val;
     public TreeNode left;
@@ -71,9 +71,81 @@ public class TreeGenerate : MonoBehaviour
         }
 
     }
-    
+
+    void ResetColor(TreeNode root)
+    {
+        Queue<TreeNode> queue = new();
+        queue.Enqueue(root);
+        int num = 1;
+
+        while (num > 0)
+        {
+            num = queue.Count;
+            for (int i = 0; i < num; i++)
+            {
+                TreeNode cur = queue.Dequeue();
+                if (cur != null)
+                {
+                    cur.val.GetComponent<MeshRenderer>().material.color=Color.white;
+                    if (cur.left != null)
+                    {
+                        queue.Enqueue(cur.left);
+                    }
+
+                    if (cur.left != null)
+                    {
+                        queue.Enqueue(cur.right);
+                    }   
+                }
+            }
+        }
+    }
     private void Start()
     {
         CreateTree(nodeNums);
+    }
+
+    private void Update()
+    {
+        int source = 1;
+        int target = 5;
+
+        int INF = 100000;
+        int[,] graph = new int[6, 6]
+        {
+            // 0    1    2    3    4    5
+            { 0,   10,  INF, 30, 100, INF },   // 顶点0
+            { INF, 0,   50,  INF, INF, INF },   // 顶点1
+            { INF, INF, 0,   INF, 10, INF },     // 顶点2
+            { INF, INF, 20,  0,   60, INF },     // 顶点3
+            { INF, INF, INF, INF, 0,   10  },     // 顶点4
+            { INF, INF, INF, INF, INF, 0   }      // 顶点5
+        };
+        
+        
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            Algorithm.BFS(_root);
+        }
+        else if (Input.GetKeyDown(KeyCode.B))
+        {
+            Algorithm.DFS(_root);
+        }
+        else if (Input.GetKeyDown(KeyCode.C))
+        {
+            var n = Algorithm.Dijkstra(graph,source,target);
+            Debug.Log($"从{source}到{target}的最低代价为:{n.F}");
+            Debug.Log(Algorithm.ReconstructPath(n));
+        }
+        else if (Input.GetKeyDown(KeyCode.D))
+        {
+            var n = Algorithm.Astar(graph,source,target);
+            Debug.Log($"从{source}到{target}的最低代价为:{n.F}");
+            Debug.Log(Algorithm.ReconstructPath(n));
+        }
+        else if (Input.GetKeyDown(KeyCode.R))
+        {
+            ResetColor(_root);
+        }
     }
 }
